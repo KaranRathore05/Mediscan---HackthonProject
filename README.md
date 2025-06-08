@@ -12,7 +12,6 @@ Medicine Name
 
 Usage
 
-Expiry Date
 
 Warnings
 
