@@ -1,0 +1,7 @@
+flask==3.0.2
+flask-cors==4.0.0
+python-dotenv==1.0.1
+pytesseract==0.3.10
+Pillow==10.2.0
+gTTS==2.5.1
+deep-translator==1.11.4 

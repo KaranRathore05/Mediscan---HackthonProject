@@ -1,0 +1,40 @@
+const translations = {
+    en: {
+        medicineName: "Medicine Name",
+        usage: "Usage",
+        warnings: "Warnings",
+        dosage: "Dosage",
+        sideEffects: "Side Effects",
+        scannedAt: "Scanned at",
+        capture: "Capture",
+        switchCamera: "Switch Camera",
+        gallery: "Choose from Gallery",
+        speak: "Speak",
+        setReminder: "Set Reminder",
+        medicineInfo: "Medicine Information",
+        scanHistory: "Scan History",
+        processing: "Processing...",
+        searchHistory: "Search History",
+        account: "Account",
+        privacyPolicy: "Privacy Policy"
+    },
+    hi: {
+        medicineName: "दवा का नाम",
+        usage: "उपयोग",
+        warnings: "चेतावनी",
+        dosage: "खुराक",
+        sideEffects: "साइड इफेक्ट्स",
+        scannedAt: "स्कैन किया गया",
+        capture: "कैप्चर",
+        switchCamera: "कैमरा बदलें",
+        gallery: "गैलरी से चुनें",
+        speak: "बोलें",
+        setReminder: "रिमाइंडर सेट करें",
+        medicineInfo: "दवा की जानकारी",
+        scanHistory: "स्कैन इतिहास",
+        processing: "प्रोसेसिंग...",
+        searchHistory: "इतिहास खोजें",
+        account: "खाता",
+        privacyPolicy: "गोपनीयता नीति"
+    }
+}; 

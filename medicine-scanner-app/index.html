@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicine Scanner App</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="translations.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="assets/kogo2.png" alt="Mediscan Logo" class="logo" />
+            <h1>Medicine Scanner</h1>
+            <p>Scan medicine labels and get information in your preferred language</p>
+        </header>
+
+        <main>
+            <div class="camera-section">
+                <video id="camera" autoplay playsinline></video>
+                <canvas id="canvas" style="display: none;"></canvas>
+                <div class="camera-controls">
+                    <div class="camera-buttons">
+                        <button id="capture-btn" class="btn primary" data-translate="capture">Capture</button>
+                        <button id="switch-camera-btn" class="btn secondary" data-translate="switchCamera">Switch Camera</button>
+                        <input type="file" id="gallery-upload" accept="image/*" style="display: none;">
+                        <button id="gallery-btn" class="btn secondary" data-translate="gallery">Choose from Gallery</button>
+                    </div>
+                    <div class="language-section">
+                        <select id="language" class="language-select" onchange="changeLanguage(this.value)">
+                            <option value="en">English</option>
+                            <option value="hi">हिंदी</option>
+                        </select>
+                        <div class="action-buttons">
+                            <button id="speak-btn" class="btn primary" data-translate="speak">Speak</button>
+                            <button id="reminder-btn" class="btn secondary" data-translate="setReminder">Set Reminder</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-section">
+                <h2 data-translate="medicineInfo">Medicine Information</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label data-translate="medicineName">Medicine Name:</label>
+                        <span id="medicine-name">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label data-translate="usage">Usage:</label>
+                        <span id="usage">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label data-translate="warnings">Warnings:</label>
+                        <span id="warnings">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label data-translate="dosage">Dosage:</label>
+                        <span id="dosage">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label data-translate="sideEffects">Side Effects:</label>
+                        <span id="side-effects">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label data-translate="scannedAt">Scanned at:</label>
+                        <span id="scan-time">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="history-section">
+                <h2 data-translate="scanHistory">Scan History</h2>
+                <div id="scan-history" class="history-list">
+                    </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-spinner"></div>
+        <p data-translate="processing">Processing...</p>
+    </div>
+
+    <div class="menu-container">
+        <button id="menu-btn" class="menu-btn">&#8942;</button>
+        <div id="menu-drawer" class="menu-drawer hidden">
+            <button class="menu-item" id="menu-history" data-translate="searchHistory">Search History</button>
+            <button class="menu-item" id="menu-account" data-translate="account">Account</button>
+            <button class="menu-item" id="menu-privacy" data-translate="privacyPolicy">Privacy Policy</button>
+        </div>
+        <div id="drawer-backdrop" class="drawer-backdrop hidden"></div>
+    </div>
+
+    <div id="privacy-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal" id="close-privacy-modal">&times;</span>
+            <h2>Privacy Policy</h2>
+            <div class="modal-scroll">
+                <p><strong>Moon King Solutions Privacy Policy</strong><br>
+                Effective Date: 03.11.2025</p>
+                <p>Moon King Solutions ("we," "our," or "us") values your privacy. This Privacy Policy outlines how we collect, use, disclose, and safeguard your information when you use our mobile applications, websites, and services (collectively, the "Services").</p>
+                <p>By using our Services, you agree to the collection and use of information in accordance with this policy. If you do not agree, please do not use our Services.</p>
+                <h3>Information We Collect</h3>
+                <p>We collect different types of information to provide and improve our Services, including:</p>
+                <strong>Personal Information</strong>
+                <ul>
+                    <li>Name, email address, phone number, and other contact details when you create an account or contact us.</li>
+                    <li>Health-related information you voluntarily provide, such as medications, pill identification searches, and drug preferences.</li>
+                    <li>Payment and billing information when making purchases.</li>
+                </ul>
+                <strong>Non-Personal Information</strong>
+                <ul>
+                    <li>Device type, operating system, app usage data, and browsing behavior.</li>
+                    <li>IP address, cookies, and location data (if permitted by you).</li>
+                </ul>
+                <strong>Information from Third Parties</strong>
+                <ul>
+                    <li>We may receive information from third-party services if you use their login or payment services.</li>
+                </ul>
+                <h3>How We Use Your Information</h3>
+                <ul>
+                    <li>To provide, maintain, and improve our health-related Services.</li>
+                    <li>To offer personalized drug information, pill identification, and medication-related insights.</li>
+                    <li>To process payments and transactions securely.</li>
+                    <li>To personalize user experience and offer tailored content.</li>
+                    <li>To communicate with you regarding updates, support, or promotional offers.</li>
+                    <li>To prevent fraud, enforce our terms, and comply with legal obligations.</li>
+                </ul>
+                <h3>How We Share Your Information</h3>
+                <p>We do not sell or rent your personal data. However, we may share your information in the following cases:</p>
+                <strong>Service Providers</strong>
+                <ul>
+                    <li>We may share your data with trusted third-party service providers that assist us in operating our Services (e.g., payment processors, analytics providers, cloud storage providers).</li>
+                </ul>
+                <strong>Legal Compliance</strong>
+                <ul>
+                    <li>We may disclose your data when required by law, government authorities, or to protect our rights and security.</li>
+                </ul>
+                <strong>Business Transfers</strong>
+                <ul>
+                    <li>If we are involved in a merger, acquisition, or sale of assets, your data may be transferred to the new entity.</li>
+                </ul>
+                <h3>Data Security</h3>
+                <p>We implement security measures to protect your information from unauthorized access, alteration, or disclosure. However, no method of transmission over the internet or electronic storage is 100% secure, and we cannot guarantee absolute security.</p>
+                <h3>Your Rights and Choices</h3>
+                <p>Depending on your location, you may have the right to:</p>
+                <ul>
+                    <li>Access, update, or delete your personal data.</li>
+                    <li>Withdraw consent for data processing.</li>
+                    <li>Opt-out of marketing communications.</li>
+                    <li>Disable cookies through your browser settings.</li>
+                </ul>
+                <p>To exercise these rights, please contact us at moonkingsolutions@gmail.com</p>
+                <h3>Third-Party Links and Services</h3>
+                <p>Our Services may contain links to third-party websites or services, including external drug information resources. We are not responsible for their privacy practices, and we encourage you to review their privacy policies before providing any personal data.</p>
+                <h3>Health Information Disclaimer</h3>
+                <p>Our Services provide drug-related and health information for informational purposes only. We do not offer medical advice, diagnosis, or treatment. Always consult a healthcare professional before making health-related decisions.</p>
+                <h3>Children's Privacy</h3>
+                <p>Our Services are not intended for children under the age of 13. We do not knowingly collect personal information from children. If we discover that a child under 13 has provided us with personal data, we will take steps to delete it.</p>
+                <h3>Changes to This Privacy Policy</h3>
+                <p>We may update this Privacy Policy from time to time. Any changes will be posted on this page with a revised "Effective Date." Your continued use of our Services after changes constitutes acceptance of the updated policy.</p>
+                <h3>Contact Us</h3>
+                <p>If you have any questions about this Privacy Policy, please contact us: karan0797s@gmail.com</p>
+            </div>
+        </div>
+    </div>
+
+    <button id="doctor-btn" class="doctor-btn">Doctor</button>
+    <div id="doctor-chat" class="doctor-chat hidden">
+        <div class="chat-header">
+            <span>Doctor</span>
+            <button id="close-chat" class="close-chat">&times;</button>
+        </div>
+        <div class="chat-body" id="chat-body">
+            <div class="chat-message doctor">Hello! I am your virtual doctor. Click on any question to get the answer:</div>
+        </div>
+        <div class="chat-faq">
+            <button class="faq-btn" data-answer="Paracetamol (acetaminophen) is used to relieve mild to moderate pain and reduce fever. It's commonly used for headaches, toothaches, muscle aches, and fever associated with colds and flu.">What is paracetamol used for?</button>
+
+            <button class="faq-btn" data-answer="Common side effects include: diarrhea, nausea, vomiting, rash, and allergic reactions. Some antibiotics may also cause photosensitivity or yeast infections.">What are common side effects of antibiotics?</button>
+
+            <button class="faq-btn" data-answer="Yes, you can take them together as they work differently. However, always follow the recommended dosage and consult your doctor if you're taking them regularly.">Can I take ibuprofen and paracetamol together?</button>
+
+            <button class="faq-btn" data-answer="Store medicines in a cool, dry place away from direct sunlight. Keep them out of reach of children. Some medicines may need refrigeration - check the label.">How should I store my medicines?</button>
+
+            <button class="faq-btn" data-answer="Take the missed dose as soon as you remember. If it's almost time for your next dose, skip the missed one. Never double up on doses unless specifically instructed by your doctor.">What should I do if I miss a dose?</button>
+
+            <button class="faq-btn" data-answer="Always complete the full course of antibiotics as prescribed by your doctor, even if you feel better. Stopping early can lead to antibiotic resistance.">How long should I take antibiotics?</button>
+
+            <button class="faq-btn" data-answer="It's best to avoid alcohol while taking medication unless specifically approved by your doctor. Alcohol can interact with many medications and reduce their effectiveness.">Can I drink alcohol with my medication?</button>
+
+            <button class="faq-btn" data-answer="Signs include: rash, itching, swelling, difficulty breathing, and dizziness. Seek immediate medical attention if you experience these symptoms.">What are the signs of an allergic reaction?</button>
+
+            <button class="faq-btn" data-answer="Take medications with food if recommended, stay hydrated, and report any severe side effects to your doctor. Some side effects may improve over time.">How can I manage medication side effects?</button>
+
+            <button class="faq-btn" data-answer="Follow your doctor's instructions exactly. Some medications work best at specific times of day or with/without food. Check the label or ask your pharmacist.">When should I take my medication?</button>
+        </div>
+    </div>
+    <script src="js/app.js"></script>
+</body>
+</html>
